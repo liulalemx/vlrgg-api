@@ -1,24 +1,22 @@
 import express from "express";
+import {
+  getEvent,
+  getEvents,
+  getPlayers,
+  getTeams,
+} from "../controllers/controller.js";
 
 const router = express.Router();
 
 // Get All Teams
-router.get("/teams", (req, res) => {
-  res.status(200).json({ msg: "teams" });
-});
+router.get("/teams", getTeams);
 
 // Get All Players
-router.get("/players", (req, res) => {
-  res.status(200).json({ msg: "players" });
-});
+router.get("/players", getPlayers);
 
 // Get All Events
-router.get("/events", (req, res) => {
-  res.status(200).json({ msg: "events" });
-});
+router.get("/events", getEvents);
 
 // Get Specific Event
-router.get("/events/:name", (req, res) => {
-  res.status(200).json({ msg: `event ${req.params.name}` });
-});
+router.get("/events/:name", getEvent);
 export default router;
