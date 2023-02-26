@@ -1,4 +1,5 @@
 import { Response, Request } from "express";
+import { scrapePlayers } from "../vlr-scraper.js";
 
 // @desc   GET teams
 // @route  GET /api/teams
@@ -11,7 +12,8 @@ const getTeams = async (req: Request, res: Response) => {
 // @route  GET /api/players
 // @access Public
 const getPlayers = async (req: Request, res: Response) => {
-  res.status(200).json({ msg: "players" });
+  const players = await scrapePlayers();
+  res.status(200).json(players);
 };
 
 // @desc   GET events

@@ -15,7 +15,7 @@
     "strict": true /* Enable all strict type-checking options. */,
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "src/vlr-scraper.js"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
     "esm": true
