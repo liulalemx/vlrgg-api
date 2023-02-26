@@ -5,16 +5,7 @@ const url =
   "https://www.vlr.gg/167364/zeta-division-vs-leviat-n-champions-tour-2023-lock-in-s-o-paulo-omega-ro16";
 
 const teamsInfo = {
-  tournament_name: "",
-  tournament_logo: "",
-  match_url: "",
-  match_day: "",
-  team_one_name: "",
-  team_one_logo: "",
-  team_two_name: "",
-  team_two_logo: "",
-  team_one_players: [],
-  team_two_players: [],
+  teams: [],
 };
 
 const playersInfo = {
@@ -74,6 +65,58 @@ async function scrapePlayers() {
   return playersInfo;
 }
 
-// scrapePlayers();
+async function scrapeTeams(region) {
+  // Fetch the data
+  const { data } = await axios.get(`https://www.vlr.gg/rankings/${region}`);
 
-export { scrapePlayers };
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  $(item)
+    .find("#wrapper > div.col-container > div > div.mod-scroll > div.wf-card")
+    .each((index, element) => {
+      teamsInfo.teams.push({
+        team_name: $(element).find("a.rank-item-team").attr("data-sort-value"),
+        team_logo: $(element).find("a.rank-item-team img").attr("src"),
+        team_url:
+          `www.vlr.gg` + $(element).find("a.rank-item-team").attr("href"),
+        team_rank: $(element).find("div.rank-item-rank-num").text().trim(),
+        rating_score: $(element)
+          .find("div.rank-item-rating")
+          .eq(0)
+          .text()
+          .trim(),
+        recent_match: {
+          match_url:
+            `www.vlr.gg` + $(element).find("a.rank-item-last").attr("href"),
+          match_time: $(element)
+            .find("a.rank-item-last div")
+            .eq(0)
+            .text()
+            .trim(),
+          opponent_team_name: $(element)
+            .find("a.rank-item-last div span")
+            .eq(1)
+            .text()
+            .trim(),
+          opponent_team_logo_url: $(element)
+            .find("a.rank-item-last div img")
+            .attr("src"),
+        },
+        win_streak: $(element).find("div.rank-item-streak span").text().trim(),
+        record: $(element).find("div.rank-item-record").eq(0).text().trim(),
+        total_winnings: $(element).find("div.rank-item-earnings").text().trim(),
+      });
+    });
+
+  if (teamsInfo.teams.length > 0) {
+    return teamsInfo;
+  } else {
+    return "Unable to fetch data";
+  }
+}
+
+export { scrapePlayers, scrapeTeams };

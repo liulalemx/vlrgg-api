@@ -3,13 +3,13 @@ import {
   getEvent,
   getEvents,
   getPlayers,
-  getTeams,
+  getRankings,
 } from "../controllers/controller.js";
 
 const router = express.Router();
 
-// Get All Teams
-router.get("/teams", getTeams);
+// Get Team Rankings
+router.get("/rankings/:region", getRankings);
 
 // Get All Players
 router.get("/players", getPlayers);
