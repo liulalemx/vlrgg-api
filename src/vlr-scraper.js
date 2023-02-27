@@ -17,6 +17,19 @@ const eventsInfo = {
 };
 
 const eventInfo = {
+  event_name: "",
+  event_logo: "",
+  event_url: "",
+  description: "",
+  dates: "",
+  prize_pool: "",
+  location: "",
+  teams: [],
+  upcoming_matches: [],
+  latest_results: [],
+};
+
+const matchInfo = {
   tournament_name: "",
   tournament_logo: "",
   match_url: "",
@@ -141,7 +154,7 @@ async function scrapeEvents() {
       eventsInfo.events.push({
         event_name: $(element).find("div.event-item-title").text().trim(),
         event_logo: $(element).find("div.event-item-thumb img").attr("src"),
-        event_url: `www.vlr.gg` + $(element).attr("href"),
+        event_url: "www.vlr.gg" + $(element).attr("href"),
         prize_pool: $(element)
           .find("div.mod-prize")
           .clone()
@@ -169,4 +182,120 @@ async function scrapeEvents() {
   }
 }
 
-export { scrapePlayers, scrapeTeams, scrapeEvents };
+async function scrapeEvent(event_url) {
+  // Fetch the data
+  const { data } = await axios.get(`${event_url}`);
+
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  eventInfo.event_name = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.event-desc > div > h1"
+    )
+    .text()
+    .trim();
+  eventInfo.event_url = event_url;
+  eventInfo.event_logo = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.wf-avatar.event-header-thumb > div > img"
+    )
+    .attr("src");
+  eventInfo.description = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.event-desc > div > h2"
+    )
+    .text()
+    .trim();
+  eventInfo.dates = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.event-desc > div > div.event-desc-items > div:nth-child(1) > div.event-desc-item-value"
+    )
+    .text()
+    .trim();
+  eventInfo.prize_pool = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.event-desc > div > div.event-desc-items > div:nth-child(2) > div.event-desc-item-value"
+    )
+    .text()
+    .trim();
+  eventInfo.location = $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.wf-card.mod-event.mod-header.mod-full > div.event-header > div.event-desc > div > div.event-desc-items > div.event-desc-item.mod-last > div.event-desc-item-value"
+    )
+    .text()
+    .trim();
+
+  // populate teams
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.event-container > div.event-content > div.event-teams-container div.event-team"
+    )
+    .each((index, element) => {
+      eventInfo.teams.push({
+        team_name: $(element).find("a.event-team-name").text().trim(),
+        team_logo_url: $(element)
+          .find("div.event-team-players img")
+          .attr("src"),
+      });
+    });
+
+  // Populate upsoming matches
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.event-container > div.event-sidebar > div > div:nth-child(2) > a"
+    )
+    .each((index, element) => {
+      eventInfo.upcoming_matches.push({
+        team_one_name: $(element)
+          .find("div.event-sidebar-matches-team div.name span")
+          .eq(0)
+          .text()
+          .trim(),
+        team_two_name: $(element)
+          .find("div.event-sidebar-matches-team div.name span")
+          .eq(1)
+          .text()
+          .trim(),
+        ETA: $(element).find("div.eta").text().trim(),
+      });
+    });
+
+  // Populate latest results
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.event-container > div.event-sidebar > div > div:nth-child(5) > a"
+    )
+    .each((index, element) => {
+      eventInfo.latest_results.push({
+        team_one_name: $(element)
+          .find("div.event-sidebar-matches-team div.name span")
+          .eq(0)
+          .text()
+          .trim(),
+        team_one_score: $(element)
+          .find("div.event-sidebar-matches-team div.score")
+          .eq(0)
+          .text()
+          .trim(),
+        team_two_name: $(element)
+          .find("div.event-sidebar-matches-team div.name span")
+          .eq(1)
+          .text()
+          .trim(),
+        team_two_score: $(element)
+          .find("div.event-sidebar-matches-team div.score")
+          .eq(1)
+          .text()
+          .trim(),
+        ETA: $(element).find("div.eta").text().trim(),
+      });
+    });
+
+  return eventInfo;
+}
+
+export { scrapePlayers, scrapeTeams, scrapeEvents, scrapeEvent };

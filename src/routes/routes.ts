@@ -19,7 +19,7 @@ router.get("/players", getPlayers);
 router.get("/events", getEvents);
 
 // Get Specific Event
-router.get("/events/:name", getEvent);
+router.get("/events/:url", getEvent);
 
 // Get Completed Match Results
 router.get("/matches", getMatches);
