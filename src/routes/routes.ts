@@ -2,9 +2,10 @@ import express from "express";
 import {
   getEvent,
   getEvents,
+  getMatchResults,
   getPlayers,
   getRankings,
-  getMatches,
+  getUpcomingMatches,
 } from "../controllers/controller.js";
 
 const router = express.Router();
@@ -21,7 +22,10 @@ router.get("/events", getEvents);
 // Get Specific Event
 router.get("/events/:url", getEvent);
 
+// Get Upcoming matches
+router.get("/matches/upcoming", getUpcomingMatches);
+
 // Get Completed Match Results
-router.get("/matches", getMatches);
+router.get("/matches/results", getMatchResults);
 
 export default router;

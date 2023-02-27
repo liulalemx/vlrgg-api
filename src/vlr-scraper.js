@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { time } from "console";
 
 const url =
   "https://www.vlr.gg/167364/zeta-division-vs-leviat-n-champions-tour-2023-lock-in-s-o-paulo-omega-ro16";
@@ -27,6 +28,14 @@ const eventInfo = {
   teams: [],
   upcoming_matches: [],
   latest_results: [],
+};
+
+const upcomingMatches = {
+  matches: [],
+};
+
+const matchResults = {
+  matches: [],
 };
 
 const matchInfo = {
@@ -298,4 +307,113 @@ async function scrapeEvent(event_url) {
   return eventInfo;
 }
 
-export { scrapePlayers, scrapeTeams, scrapeEvents, scrapeEvent };
+async function scrapeUpcomingMatches() {
+  // Fetch the data
+  const { data } = await axios.get("https://www.vlr.gg/matches");
+
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  $(item)
+    .find("#wrapper > div.col-container div div.wf-card")
+    .each((index, element) => {
+      $(element)
+        .find("a.match-item")
+        .each((ind, ele) => {
+          upcomingMatches.matches.push({
+            team_one_name: $(ele)
+              .find("div.match-item-vs-team-name")
+              .eq(0)
+              .text()
+              .trim(),
+            team_two_name: $(ele)
+              .find("div.match-item-vs-team-name")
+              .eq(1)
+              .text()
+              .trim(),
+            match_url: `www.vlr.gg` + $(ele).attr("href"),
+            event_name: $(ele)
+              .find("div.match-item-event")
+              .clone()
+              .children()
+              .remove()
+              .end()
+              .text()
+              .trim(),
+            event_icon_url: $(ele).find("div.match-item-icon img").attr("src"),
+            match_time: $(ele).find("div.match-item-time").text().trim(),
+            eta: $(ele).find("div.ml-eta").text().trim(),
+          });
+        });
+    });
+
+  return upcomingMatches;
+}
+
+async function scrapeMatchResults() {
+  // Fetch the data
+  const { data } = await axios.get("https://www.vlr.gg/matches/results");
+
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  $(item)
+    .find("#wrapper > div.col-container div div.wf-card")
+    .each((index, element) => {
+      $(element)
+        .find("a.match-item")
+        .each((ind, ele) => {
+          matchResults.matches.push({
+            team_one_name: $(ele)
+              .find("div.match-item-vs-team-name")
+              .eq(0)
+              .text()
+              .trim(),
+            team_two_name: $(ele)
+              .find("div.match-item-vs-team-name")
+              .eq(1)
+              .text()
+              .trim(),
+            team_one_score: $(ele)
+              .find("div.match-item-vs-team-score")
+              .eq(0)
+              .text()
+              .trim(),
+            team_two_score: $(ele)
+              .find("div.match-item-vs-team-score")
+              .eq(1)
+              .text()
+              .trim(),
+            match_url: `www.vlr.gg` + $(ele).attr("href"),
+            event_name: $(ele)
+              .find("div.match-item-event")
+              .clone()
+              .children()
+              .remove()
+              .end()
+              .text()
+              .trim(),
+            event_icon_url: $(ele).find("div.match-item-icon img").attr("src"),
+            match_time: $(ele).find("div.match-item-time").text().trim(),
+            eta: $(ele).find("div.ml-eta").text().trim(),
+          });
+        });
+    });
+
+  return matchResults;
+}
+
+export {
+  scrapePlayers,
+  scrapeTeams,
+  scrapeEvents,
+  scrapeEvent,
+  scrapeUpcomingMatches,
+  scrapeMatchResults,
+};

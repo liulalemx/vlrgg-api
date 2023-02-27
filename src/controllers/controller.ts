@@ -2,8 +2,10 @@ import { Response, Request } from "express";
 import {
   scrapeEvent,
   scrapeEvents,
+  scrapeMatchResults,
   scrapePlayers,
   scrapeTeams,
+  scrapeUpcomingMatches,
 } from "../vlr-scraper.js";
 
 // @desc   GET rankings
@@ -38,9 +40,27 @@ const getEvent = async (req: Request, res: Response) => {
   res.status(200).json(event);
 };
 
-// @desc   GET matches
-// @route  GET /api/matches
+// @desc   GET upcoming matches
+// @route  GET /api/matches/upcoming
 // @access Public
-const getMatches = async (req: Request, res: Response) => {};
+const getUpcomingMatches = async (req: Request, res: Response) => {
+  const upcomingMatches = await scrapeUpcomingMatches();
+  res.status(200).json(upcomingMatches);
+};
 
-export { getRankings, getPlayers, getEvents, getEvent, getMatches };
+// @desc   GET match results
+// @route  GET /api/matches/results
+// @access Public
+const getMatchResults = async (req: Request, res: Response) => {
+  const upcomingMatches = await scrapeMatchResults();
+  res.status(200).json(upcomingMatches);
+};
+
+export {
+  getRankings,
+  getPlayers,
+  getEvents,
+  getEvent,
+  getUpcomingMatches,
+  getMatchResults,
+};
