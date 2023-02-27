@@ -12,6 +12,10 @@ const playersInfo = {
   players: [],
 };
 
+const eventsInfo = {
+  events: [],
+};
+
 const eventInfo = {
   tournament_name: "",
   tournament_logo: "",
@@ -115,8 +119,54 @@ async function scrapeTeams(region) {
   if (teamsInfo.teams.length > 0) {
     return teamsInfo;
   } else {
-    return "Unable to fetch data";
+    return "Data scrape taking too long";
   }
 }
 
-export { scrapePlayers, scrapeTeams };
+async function scrapeEvents() {
+  // Fetch the data
+  const { data } = await axios.get(`https://www.vlr.gg/events`);
+
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div > div.events-container > div:nth-child(1) > a"
+    )
+    .each((index, element) => {
+      eventsInfo.events.push({
+        event_name: $(element).find("div.event-item-title").text().trim(),
+        event_logo: $(element).find("div.event-item-thumb img").attr("src"),
+        event_url: `www.vlr.gg` + $(element).attr("href"),
+        prize_pool: $(element)
+          .find("div.mod-prize")
+          .clone()
+          .children()
+          .remove()
+          .end()
+          .text()
+          .trim(),
+        dates: $(element)
+          .find("div.mod-dates")
+          .clone()
+          .children()
+          .remove()
+          .end()
+          .text()
+          .trim(),
+        region: $(element).find("div.mod-location i").attr("class").slice(-2),
+      });
+    });
+
+  if (eventsInfo.events.length > 0) {
+    return eventsInfo;
+  } else {
+    return "Data scrape taking too long";
+  }
+}
+
+export { scrapePlayers, scrapeTeams, scrapeEvents };
