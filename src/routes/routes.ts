@@ -2,6 +2,7 @@ import express from "express";
 import {
   getEvent,
   getEvents,
+  getMatch,
   getMatchResults,
   getPlayers,
   getRankings,
@@ -27,5 +28,8 @@ router.get("/matches/upcoming", getUpcomingMatches);
 
 // Get Completed Match Results
 router.get("/matches/results", getMatchResults);
+
+// Get Specific Match Info
+router.get("/matches/:url", getMatch);
 
 export default router;

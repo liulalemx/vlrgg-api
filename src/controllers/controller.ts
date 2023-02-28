@@ -2,6 +2,7 @@ import { Response, Request } from "express";
 import {
   scrapeEvent,
   scrapeEvents,
+  scrapeMatch,
   scrapeMatchResults,
   scrapePlayers,
   scrapeTeams,
@@ -56,6 +57,14 @@ const getMatchResults = async (req: Request, res: Response) => {
   res.status(200).json(upcomingMatches);
 };
 
+// @desc   GET match
+// @route  GET /api/matches/:url
+// @access Public
+const getMatch = async (req: Request, res: Response) => {
+  const match = await scrapeMatch(req.params.url);
+  res.status(200).json(match);
+};
+
 export {
   getRankings,
   getPlayers,
@@ -63,4 +72,5 @@ export {
   getEvent,
   getUpcomingMatches,
   getMatchResults,
+  getMatch,
 };

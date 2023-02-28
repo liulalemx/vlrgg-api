@@ -45,8 +45,10 @@ const matchInfo = {
   match_day: "",
   team_one_name: "",
   team_one_logo: "",
+  team_one_score: "",
   team_two_name: "",
   team_two_logo: "",
+  team_two_score: "",
   team_one_players: [],
   team_two_players: [],
 };
@@ -409,6 +411,134 @@ async function scrapeMatchResults() {
   return matchResults;
 }
 
+async function scrapeMatch(match_url) {
+  // Fetch the data
+  const { data } = await axios.get(
+    "https://www.vlr.gg/167374/natus-vincere-vs-leviat-n-champions-tour-2023-lock-in-s-o-paulo-omega-sf"
+  );
+
+  // Load up the html
+  const $ = cheerio.load(data);
+  const item = $("div#wrapper");
+
+  // Extract the data that we need
+
+  matchInfo.tournament_name = $(item)
+    .find("a.match-header-event  div div")
+    .eq(0)
+    .text()
+    .trim();
+  matchInfo.tournament_logo = $(item)
+    .find("a.match-header-event  img")
+    .attr("src");
+  matchInfo.match_url = match_url;
+  matchInfo.match_day = $(item)
+    .find("div.moment-tz-convert")
+    .eq(0)
+    .text()
+    .trim();
+  matchInfo.team_one_name = $(item)
+    .find("a.mod-1 div.wf-title-med")
+    .text()
+    .trim();
+  matchInfo.team_one_logo = $(item).find("a.mod-1 img").attr("src");
+  matchInfo.team_one_score = $(item)
+    .find("div.match-header-vs-score div span")
+    .eq(0)
+    .text()
+    .trim();
+  matchInfo.team_two_name = $(item)
+    .find("a.mod-2 div.wf-title-med")
+    .text()
+    .trim();
+  matchInfo.team_two_logo = $(item).find("a.mod-2 img").attr("src");
+  matchInfo.team_two_score = $(item)
+    .find("div.match-header-vs-score div span")
+    .eq(2)
+    .text()
+    .trim();
+
+  //   Team one Players
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div.col.mod-3 > div:nth-child(6) > div > div.vm-stats-container > div.vm-stats-game.mod-active > div:nth-child(2) > div:nth-child(1) > table > tbody > tr"
+    )
+    .each((index, element) => {
+      const tds = $(element).find("td ");
+      matchInfo.team_one_players.push({
+        player_name: $(tds[0]).find("div.text-of").eq(0).text().trim(),
+        player_link: `www.vlr.gg` + $(tds[0]).find("a").attr("href"),
+        player_team_initials: $(tds[0]).find("div.ge-text-light").text().trim(),
+        player_country_initials: $(tds[0]).find("i").attr("class").slice(-2),
+        rating: $(tds[2]).find("span span").eq(0).text().trim(),
+        average_combat_score: $(tds[3]).find("span span").eq(0).text().trim(),
+        kills: $(tds[4]).find("span span").eq(0).text().trim(),
+        deaths: $(tds[5]).find("span span.mod-both").eq(0).text().trim(),
+        assists: $(tds[6]).find("span span").eq(0).text().trim(),
+        kills_deaths: $(tds[7]).find("span span").eq(0).text().trim(),
+        kill_assist_trade_survive_percentage: $(tds[8])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+        average_damage_per_round: $(tds[9])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+        headshot_percentage: $(tds[10]).find("span span").eq(0).text().trim(),
+        first_kills: $(tds[11]).find("span span").eq(0).text().trim(),
+        first_deaths: $(tds[12]).find("span span").eq(0).text().trim(),
+        first_kills_first_deaths: $(tds[13])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+      });
+    });
+
+  //   Team two Players
+  $(item)
+    .find(
+      "#wrapper > div.col-container > div.col.mod-3 > div:nth-child(6) > div > div.vm-stats-container > div.vm-stats-game.mod-active > div:nth-child(2) > div:nth-child(2) > table > tbody > tr"
+    )
+    .each((index, element) => {
+      const tds = $(element).find("td ");
+      matchInfo.team_two_players.push({
+        player_name: $(tds[0]).find("div.text-of").eq(0).text().trim(),
+        player_link: `www.vlr.gg` + $(tds[0]).find("a").attr("href"),
+        player_team_initials: $(tds[0]).find("div.ge-text-light").text().trim(),
+        player_country_initials: $(tds[0]).find("i").attr("class").slice(-2),
+        rating: $(tds[2]).find("span span").eq(0).text().trim(),
+        average_combat_score: $(tds[3]).find("span span").eq(0).text().trim(),
+        kills: $(tds[4]).find("span span").eq(0).text().trim(),
+        deaths: $(tds[5]).find("span span.mod-both").eq(0).text().trim(),
+        assists: $(tds[6]).find("span span").eq(0).text().trim(),
+        kills_deaths: $(tds[7]).find("span span").eq(0).text().trim(),
+        kill_assist_trade_survive_percentage: $(tds[8])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+        average_damage_per_round: $(tds[9])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+        headshot_percentage: $(tds[10]).find("span span").eq(0).text().trim(),
+        first_kills: $(tds[11]).find("span span").eq(0).text().trim(),
+        first_deaths: $(tds[12]).find("span span").eq(0).text().trim(),
+        first_kills_first_deaths: $(tds[13])
+          .find("span span")
+          .eq(0)
+          .text()
+          .trim(),
+      });
+    });
+
+  return matchInfo;
+}
+
 export {
   scrapePlayers,
   scrapeTeams,
@@ -416,4 +546,5 @@ export {
   scrapeEvent,
   scrapeUpcomingMatches,
   scrapeMatchResults,
+  scrapeMatch,
 };
