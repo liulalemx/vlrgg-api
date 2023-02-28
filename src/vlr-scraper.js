@@ -55,7 +55,9 @@ const matchInfo = {
 
 async function scrapePlayers() {
   // Fetch the data
-  const { data } = await axios.get("https://www.vlr.gg/stats");
+  const { data } = await axios.get(
+    "https://www.vlr.gg/stats/?event_group_id=all&event_id=all&region=all&country=all&min_rounds=200&min_rating=1550&agent=all&map_id=all&timespan=all"
+  );
 
   // Load up the html
   const $ = cheerio.load(data);
@@ -413,9 +415,7 @@ async function scrapeMatchResults() {
 
 async function scrapeMatch(match_url) {
   // Fetch the data
-  const { data } = await axios.get(
-    "https://www.vlr.gg/167374/natus-vincere-vs-leviat-n-champions-tour-2023-lock-in-s-o-paulo-omega-sf"
-  );
+  const { data } = await axios.get(`${match_url}`);
 
   // Load up the html
   const $ = cheerio.load(data);
