@@ -3,7 +3,8 @@
   "packageManager": "yarn@3.3.1",
   "type": "module",
   "scripts": {
-    "start": "tsc -w & node dist/server.js",
+    "start": "node dist/server.js",
+    "build": "tsc",
     "dev": "tsc -w & nodemon dist/server.js"
   },
   "devDependencies": {
