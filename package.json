@@ -3,7 +3,8 @@
   "packageManager": "yarn@3.3.1",
   "type": "module",
   "scripts": {
-    "start": "tsc -w & nodemon dist/server.js"
+    "start": "tsc -w & node dist/server.js",
+    "dev": "tsc -w & nodemon dist/server.js"
   },
   "devDependencies": {
     "@types/apicache": "^1.6.1",
