@@ -3,8 +3,7 @@
   "packageManager": "yarn@3.3.1",
   "type": "module",
   "scripts": {
-    "scrape": "node src/vlr-scraper.js",
-    "dev": "tsc -w & nodemon dist/server.js"
+    "start": "tsc -w & nodemon dist/server.js"
   },
   "devDependencies": {
     "@types/apicache": "^1.6.1",
