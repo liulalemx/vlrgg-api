@@ -14,8 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api", routes);
+
 app.get("/", (req, res) => {
-  res.redirect("https://documenter.getpostman.com/view/21591099/2s93CUHVaw");
+  res.send("Welcome to vlr.gg api!");
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
