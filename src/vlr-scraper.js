@@ -55,9 +55,7 @@ const matchInfo = {
 
 async function scrapePlayers() {
   // Fetch the data
-  const { data } = await axios.get(
-    "https://www.vlr.gg/stats/?event_group_id=all&event_id=all&region=all&country=all&min_rounds=200&min_rating=1550&agent=all&map_id=all&timespan=all"
-  );
+  const { data } = await axios.get("https://www.vlr.gg/stats");
 
   // Load up the html
   const $ = cheerio.load(data);
